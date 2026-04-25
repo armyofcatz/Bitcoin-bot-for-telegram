@@ -1,0 +1,38 @@
+import telebot
+import requests
+import time
+import threading
+TOKEN = '8638479869:AAFERYiFmeFx88nSPltakB0ePcbGcVGQIKU'
+bot = telebot.TeleBot(TOKEN)
+def get_btc_price():
+    try:
+        response = requests.get('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT')
+        data = response.json()
+        return float(data['price'])
+    except:
+        return None
+@bot.message_handler(commands=['start'])
+def start(message):
+    bot.reply_to(message, "crypto price bot started. i'll send btc price every hour.\nuse /price to get it now.")
+@bot.message_handler(commands=['price'])
+def send_price(message):
+    price = get_btc_price()
+    if price:
+        bot.reply_to(message, f"current bitcoin price: ${price:,.2f}")
+    else:
+        bot.reply_to(message, "Sorry, can't get the price right now.")
+def hourly_alert():
+    while True:
+        price = get_btc_price()
+        if price:
+            try:
+                bot.send_message(chat_id=YOUR_CHAT_ID_HERE, text=f"hourly btc: ${price:,.2f}")
+            except:
+                pass
+        time.sleep(3600)  # 1 hour
+YOUR_CHAT_ID_HERE = 8638479869 
+if __name__ == "__main__":
+    print("the bot started")
+    # start the hourly alerts in background
+    threading.Thread(target=hourly_alert, daemon=True).start()
+    bot.infinity_polling()
