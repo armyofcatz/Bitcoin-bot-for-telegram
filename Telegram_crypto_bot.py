@@ -4,8 +4,8 @@ import time
 import threading
 import os
 
-TOKEN = os.getenv("TOKEN") or "PUT_REAL_TOKEN_HERE"
-CHAT_ID = int(os.getenv("CHAT_ID") or 123456789)
+TOKEN = os.getenv("TOKEN")
+CHAT_ID = int(os.getenv("CHAT_ID")
 
 bot = telebot.TeleBot(TOKEN, parse_mode='HTML')
 
