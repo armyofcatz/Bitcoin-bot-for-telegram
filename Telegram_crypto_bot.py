@@ -5,9 +5,8 @@ import threading
 import os
 from dotenv import load_dotenv  
 load_dotenv()
-TOKEN = os.getenv("TOKEN")
-CHAT_ID = int(os.getenv("CHAT_ID"))
-
+TOKEN = os.getenv("TOKEN") or "8638479869:AAFERYiFmeFx88nSPltakB0ePcbGcVGQIKU"
+CHAT_ID = int(os.getenv("CHAT_ID") or 5345408320)
 bot = telebot.TeleBot(TOKEN, parse_mode='HTML')
 
 def get_price(symbol="BTCUSDT"):
