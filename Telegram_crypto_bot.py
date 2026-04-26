@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv  
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
-CHAT_ID = int(os.getenv("CHAT_ID")
+CHAT_ID = int(os.getenv("CHAT_ID"))
 
 bot = telebot.TeleBot(TOKEN, parse_mode='HTML')
 
