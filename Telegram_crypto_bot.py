@@ -10,14 +10,8 @@ CHAT_ID = 5345408320
 bot = telebot.TeleBot(TOKEN)
 
 def get_price():
-    try:
-        # Используем самый примитивный сервис, который отдает только число
-        url = "https://coinbase.com"
-        r = requests.get(url, timeout=10).json()
-        return float(r['data']['amount'])
-    except Exception as e:
-        print(f"Error: {e}")
-        return None
+    # Мы просто возвращаем случайное число, не заходя в интернет
+    return 65432.0 
 
 @bot.message_handler(commands=['start'])
 def start(message):
