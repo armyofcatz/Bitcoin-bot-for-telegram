@@ -14,22 +14,25 @@ CHAT_ID = int(os.getenv("CHAT_ID") or 5345408320)
 bot = telebot.TeleBot(TOKEN, parse_mode='HTML')
 app = Flask(__name__)
 
-def get_price(symbol="BTCUSDT"):
+def get_price(coin="BTC"):
+    # 1. Попытка через Coinbase (самая стабильная для облаков)
     try:
-        # Попытка через Bybit (обычно работает везде)
+        url = f"https://coinbase.com{coin}-USD/spot"
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        res = requests.get(url, headers=headers, timeout=10)
+        if res.status_code == 200:
+            return float(res.json()['data']['amount'])
+    except:
+        pass
+
+    # 2. Запасная попытка через Bybit
+    try:
+        symbol = f"{coin}USDT"
         url = f"https://bybit.com{symbol}"
-        response = requests.get(url, timeout=10)
-        data = response.json()
-        return float(data['result']['list'][0]['lastPrice'])
-    except Exception as e:
-        print(f"Bybit error: {e}")
-        # Запасной вариант через CryptoCompare
-        try:
-            url_alt = f"https://cryptocompare.com{symbol[:3]}&tsyms=USD"
-            res_alt = requests.get(url_alt, timeout=10)
-            return float(res_alt.json()['USD'])
-        except:
-            return None
+        res = requests.get(url, timeout=10)
+        return float(res.json()['result']['list'][0]['lastPrice'])
+    except:
+        return None
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -37,7 +40,7 @@ def start(message):
 
 @bot.message_handler(commands=['price'])
 def price(message):
-    btc = get_price("BTCUSDT")
+    btc = get_price("BTC")
     if btc:
         bot.reply_to(message, f"bitcoin: ${btc:,.0f}")
     else:
@@ -45,8 +48,8 @@ def price(message):
 
 @bot.message_handler(commands=['all'])
 def all_prices(message):
-    btc = get_price("BTCUSDT")
-    eth = get_price("ETHUSDT")
+    btc = get_price("BTC")
+    eth = get_price("ETH")
     if btc and eth:
         bot.reply_to(message, f"crypto prices\n\nbtc: ${btc:,.0f}\neth: ${eth:,.0f}")
     else:
@@ -54,7 +57,7 @@ def all_prices(message):
 
 def hourly_alert():
     while True:
-        btc = get_price("BTCUSDT")
+        btc = get_price("BTC")
         if btc:
             try:
                 bot.send_message(CHAT_ID, f"hourly report btc: ${btc:,.0f}")
