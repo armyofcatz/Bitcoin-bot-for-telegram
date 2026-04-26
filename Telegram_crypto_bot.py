@@ -2,8 +2,8 @@ import telebot
 import requests
 import time
 import threading
+import re
 
-# Твои данные
 TOKEN = "8638479869:AAFERYiFmeFx88nSPltakB0ePcbGcVGQIKU"
 CHAT_ID = 5345408320
 
@@ -11,13 +11,22 @@ bot = telebot.TeleBot(TOKEN)
 
 def get_price():
     try:
-        # Используем максимально открытый API от CryptoCompare
-        url = "https://cryptocompare.com"
-        # Добавляем таймаут побольше, чтобы сервер успел ответить
-        r = requests.get(url, timeout=20)
-        return float(r.json()['USD'])
-    except Exception as e:
-        print(f"Error: {e}")
+        # Идем не на биржу, а в Google Search. Его сервера не банят.
+        url = "https://google.com"
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+        r = requests.get(url, headers=headers, timeout=15)
+        
+        # Ищем число в тексте страницы (грубый, но эффективный метод)
+        # Находит что-то похожее на "65,123.45"
+        match = re.search(r'(\d{1,3}(?:,\d{3})*(?:\.\d+)?)\sUnited States Dollar', r.text)
+        if match:
+            price_str = match.group(1).replace(',', '')
+            return float(price_str)
+        
+        # Если Google не отдал, пробуем легкий API Blockchain.info еще раз с User-Agent
+        r2 = requests.get("https://blockchain.info", headers=headers, timeout=10)
+        return float(r2.json()['USD']['last'])
+    except:
         return None
 
 @bot.message_handler(commands=['start'])
