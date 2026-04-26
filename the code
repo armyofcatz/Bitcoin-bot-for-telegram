@@ -2,7 +2,7 @@ import telebot
 import requests
 import time
 import threading
-TOKEN = '8638479869:AAFERYiFmeFx88nSPltakB0ePcbGcVGQIKU'
+TOKEN = 'Paste_Your_Token_here'
 bot = telebot.TeleBot(TOKEN)
 def get_btc_price():
     try:
@@ -30,7 +30,7 @@ def hourly_alert():
             except:
                 pass
         time.sleep(3600)  # 1 hour
-YOUR_CHAT_ID_HERE = 8638479869 
+YOUR_CHAT_ID_HERE = #place your chat id here 
 if __name__ == "__main__":
     print("the bot started")
     # start the hourly alerts in background
