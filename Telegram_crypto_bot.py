@@ -3,15 +3,22 @@ import requests
 import time
 import threading
 
-# ВСТАВЬ СЮДА СВОИ ДАННЫЕ В КАВЫЧКИ НАПРЯМУЮ
+# Твои данные
 TOKEN = "8638479869:AAFERYiFmeFx88nSPltakB0ePcbGcVGQIKU"
 CHAT_ID = 5345408320
 
 bot = telebot.TeleBot(TOKEN)
 
 def get_price():
-    # Мы просто возвращаем случайное число, не заходя в интернет
-    return 65432.0 
+    try:
+        # Используем максимально открытый API от CryptoCompare
+        url = "https://cryptocompare.com"
+        # Добавляем таймаут побольше, чтобы сервер успел ответить
+        r = requests.get(url, timeout=20)
+        return float(r.json()['USD'])
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -21,9 +28,9 @@ def start(message):
 def price(message):
     val = get_price()
     if val:
-        bot.reply_to(message, f"btc: ${val:,.0f}")
+        bot.reply_to(message, f"bitcoin: ${val:,.0f}")
     else:
-        bot.reply_to(message, "fetch failed")
+        bot.reply_to(message, "price fetch failed")
 
 def alert():
     while True:
@@ -38,4 +45,5 @@ if __name__ == "__main__":
     print("bot is running")
     threading.Thread(target=alert, daemon=True).start()
     bot.infinity_polling()
+
 
